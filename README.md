@@ -1,5 +1,5 @@
 # Trabajo_SRA
-Repositorio para la realización del trabajo de curso de Sistemas Robóticos Autónomos
+Repositorio para la realización del trabajo de curso de Sistemas Robóticos Autónomos, el cual trata de una competición usando los robots Lego Mindstorms.
 
 ## Objetivo
 El robot debe aparcar entre dos latas separadas 40cm entre sí, y situadas tal y como se muestra en la siguiente figura (dimensiones aproximadas), utilizando como referencia la pizarra existente en el laboratorio.
