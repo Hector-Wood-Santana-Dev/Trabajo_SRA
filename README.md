@@ -14,3 +14,9 @@ El robot deberá emitir un sonido y cambiar el color de los leds antes de realiz
 Deberá desplazarse hasta la zona de aparcamiento sin tirar las latas, emitiendo un sonido y cambiando el color de los leds cuando haya finalizado. En ese momento, se detendrá el cronómetro. Para que el aparcamiento se considere perfecto, debe quedar una rueda a cada lado de la línea, sin pisarla.
 
 Puntos de aparcamiento: una rueda a cada lado 10 ptos, una rueda a un lado y la otra pisando la línea 3 ptos, las dos ruedas pisando la línea 2 ptos.
+
+## Métodos & Clases Implementadas
+- Clase ``SensorManager`` para controlar los sensores (*Ultrasonido* y *Color*).
+- Clase ``MovementController`` para controlar el movimento del robot.
+- Función para la maniobra inicial ``maniobra_inicial()``.
+- Función para la maniobra para evitar un obstáculo ``maniobra_evitar_obstaculos()``.

@@ -88,7 +88,7 @@ sensor_manager = SensorManager(color_sensor, ultrasonic_sensor)
 # Controlador del movimiento
 movement_controller = MovementController(steering_drive.left_motor, steering_drive.right_motor, steering_drive)
 
-# Función para localizar el la linea negra
+# Función para localizar si el robot está a la derecha o la izquierda de la línea negra.
 def maniobra_inicial():
     derecha = False
     izquierda = False
@@ -105,7 +105,7 @@ def maniobra_inicial():
             derecha = True
             return derecha
     
-    
+
 # Función para seguir la linea negra y evitar obstáculos
 def maniobra_evitar_obstaculos():
     movement_controller.turn_left_steering(10)
@@ -132,6 +132,7 @@ def main():
     leds.set_color("RIGHT", "GREEN")
     sound.beep()
 
+    
 
     maniobra_evitar_obstaculos()
     
