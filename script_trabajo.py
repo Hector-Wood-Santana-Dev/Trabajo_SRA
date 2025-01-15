@@ -109,17 +109,82 @@ def maniobra_evitar_obstaculos(distancia):
     sleep(0.5)
     movement_controller.turn_left_steering(10)
 
+def maniobra_buscar_linea():
+    negro = False
+    obstaculos = 0
+
+    # Acercamos el robot a 20 cm o menos del obstaculo
+    for _ in range(25):
+        if sensor_manager.get_distance > 20:
+            movement_controller.move_forward_steering(10, 3)
+        else:
+            movement_controller.stop_steering()
+
+    # Mide la distancia al obstaculo
+    distancia_obstaculo = sensor_manager.get_distance
+    distancia_movimiento = distancia_obstaculo + 20
     
+    # Gira 90º a la izquierda
+    movement_controller.turn_left_steering(10)
+
+    # Se va moviendo mientras mira si encuentra la linea negra
+    for i in range(100):
+        movement_controller.move_forward_steering(10, distancia_obstaculo / 100)
+        # Si detecta "NEGRO"
+        if sensor_manager.get_color == 1:
+            movement_controller.stop_steering()
+            negro = True
+            break
+    if negro == False:
+        movement_controller.turn_right_steering(10)
+        #  Se va moviendo mientras mira si encuentra la linea negra
+        for i in range(100):
+            movement_controller.move_forward_steering(10, distancia_movimiento / 100)
+            # Si detecta "NEGRO"
+            if sensor_manager.get_color == 1:
+                movement_controller.stop_steering()
+                negro = True
+                break
+    
+    # Movemos el robot un poco más para poner las rueda encima de la línea.
+    movement_controller.move_forward_steering(10, 7.5)
+
+    # Rotamos el robot 180º hacia un obstaculo y lo marcamos.
+    for i in range(18):
+        movement_controller.turn_right_steering(10, degrees=((grados_para_giro_90_grados() * 2) / 18))
+        if sensor_manager.is_object_detected(40):
+            obstaculos += 1
+            break
+    # Una vez mirando hacia un obstaculo rotamos 90º 
+    movement_controller.turn_right_steering(10)
+    # Rotamos el robot 90º y marcamos si hay un obstaculo.
+    for i in range(18):
+        movement_controller.turn_right_steering(10, degrees=((grados_para_giro_90_grados() * 2) / 18))
+        if sensor_manager.is_object_detected(40):
+            obstaculos += 1
+            break
+    
+    if obstaculos == 1:
+        movement_controller.turn_right_steering(10)
+        # Acercamos el robot a 20 cm o menos del obstaculo
+        for _ in range(20):
+            if sensor_manager.get_distance > 20:
+                movement_controller.move_forward_steering(10, 2)
+            else:
+                movement_controller.stop_steering()
+
+        maniobra_evitar_obstaculos(sensor_manager.get_distance)
+
+    if obstaculos == 2:
+        movement_controller.stop_steering()
 
 # Programa Principal
 def main():
     # Cambiar el color de los leds y hacer un sonido
     leds.set_color("LEFT", "RED")
-    leds.set_color("RIGHT", "GREEN")
-    sound.beep()
+    leds.set_color("RIGHT", "AMBER")
+    sound.beep() 
 
-    
-    
     while deteccion == False:
         # Maniobra inical para saber donde está la linea negra y orientarnos. (Detecta objetos a < N cm)
         deteccion = maniobra_inicial(70)
@@ -129,6 +194,11 @@ def main():
 
 
     #maniobra_evitar_obstaculos(20)
+    
+    leds.set_color("LEFT", "AMBER")
+    leds.set_color("RIGHT", "GREEN")
+    sound.beep()
+    sound.beep()
     
 
 if __name__ == "__main__":
