@@ -89,45 +89,49 @@ sensor_manager = SensorManager(color_sensor, ultrasonic_sensor)
 movement_controller = MovementController(steering_drive.left_motor, steering_drive.right_motor, steering_drive)
 
 
-
-
-# Función para localizar si el robot está a la derecha o la izquierda de la línea negra.
-def maniobra_inicial():
+# Función para localizar si el robot está a la derecha o la izquierda de la línea negra y nos deja mirando al obstáculo.
+def maniobra_inicial(detection_range):
     derecha = False
     izquierda = False
+    deteccion = False
     # Giramos a la izquierda y miramos si hay algún obstaculo mientras giramos
-    for _ in range(9):
+    for i in range(9):
         movement_controller.turn_left_steering(10, degrees=(grados_para_giro_90_grados() / 9))
-        if sensor_manager.is_object_detected(50):
+        if sensor_manager.is_object_detected(detection_range):
             izquierda = True
-            return izquierda, derecha
+            deteccion = True
+            return izquierda, derecha, deteccion
     # Volvemos a la posición inicial.
     movement_controller.turn_right_steering(10)
     # Giramos a la derecha y miramos si hay algún obstaculo mientras giramos
-    for _ in range(9):
+    for i in range(9):
         movement_controller.turn_right_steering(10, degrees=(grados_para_giro_90_grados() / 9))
-        if sensor_manager.is_object_detected(50):
+        if sensor_manager.is_object_detected(detection_range):
             derecha = True
-            return izquierda, derecha
-    return izquierda, derecha
+            deteccion = True
+            return izquierda, derecha, deteccion
+    # Volvemos a la posición inicial.
+    movement_controller.turn_left_steering(10)
+    return izquierda, derecha, deteccion
     
 
 # Función para seguir la linea negra y evitar obstáculos
-def maniobra_evitar_obstaculos():
+def maniobra_evitar_obstaculos(distancia):
     movement_controller.turn_left_steering(10)
     sleep(0.5)
-    movement_controller.move_forward_steering(10,21)
+    movement_controller.move_forward_steering(10, (distancia + 2.8))
     sleep(0.5)
     movement_controller.turn_right_steering(10)
     sleep(0.5)
-    movement_controller.move_forward_steering(10, 46)
+    movement_controller.move_forward_steering(10, (distancia + 2.8) * 2 )
     sleep(0.5)
     movement_controller.turn_right_steering(10)
     sleep(0.5)
-    movement_controller.move_forward_steering(10,21)
+    movement_controller.move_forward_steering(10, (distancia + 2.8))
     sleep(0.5)
     movement_controller.turn_left_steering(10)
 
+    
 
 # Programa Principal
 def main():
@@ -136,18 +140,17 @@ def main():
     leds.set_color("RIGHT", "GREEN")
     sound.beep()
 
-    izquierda, derecha = maniobra_inicial()
-    sleep(3)
-    if izquierda == True:
-        movement_controller.move_forward_steering(30,30)
-    else:
-        sound.beep()
-    if derecha == True:
-        movement_controller.turn_left_steering(20)  
-    else:
-        sound.beep()
-        sound.beep()
-    #maniobra_evitar_obstaculos()
+    
+    
+    while deteccion == False:
+        # Maniobra inical para saber donde está la linea negra y orientarnos. (Detecta objetos a < N cm)
+        izquierda, derecha, deteccion = maniobra_inicial(70)
+        if deteccion == False:
+            movement_controller.move_forward_steering(10, 15)
+    
+
+
+    #maniobra_evitar_obstaculos(20)
     
 
 if __name__ == "__main__":
