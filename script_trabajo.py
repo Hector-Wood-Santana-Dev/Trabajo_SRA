@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 from ev3dev2.motor import MoveSteering, OUTPUT_C, OUTPUT_B
-from ev3dev2.sensor import INPUT_2, INPUT_4
+#from ev3dev2.sensor import INPUT_2, INPUT_4
 from ev3dev2.sensor.lego import UltrasonicSensor, ColorSensor
 from ev3dev2.sound import Sound
 from ev3dev2.led import Leds
@@ -79,8 +79,8 @@ class MovementController:
     
 # Inicializar los motores y los sensores
 steering_drive = MoveSteering(OUTPUT_B, OUTPUT_C)
-color_sensor = ColorSensor(INPUT_4)
-ultrasonic_sensor = UltrasonicSensor(INPUT_2)
+color_sensor = ColorSensor()
+ultrasonic_sensor = UltrasonicSensor()
 sound = Sound()
 leds = Leds()
 # Controlador de los sensores
@@ -88,22 +88,28 @@ sensor_manager = SensorManager(color_sensor, ultrasonic_sensor)
 # Controlador del movimiento
 movement_controller = MovementController(steering_drive.left_motor, steering_drive.right_motor, steering_drive)
 
+
+
+
 # Función para localizar si el robot está a la derecha o la izquierda de la línea negra.
 def maniobra_inicial():
     derecha = False
     izquierda = False
     # Giramos a la izquierda y miramos si hay algún obstaculo mientras giramos
-    while movement_controller.turn_left_steering():
-        if sensor_manager.is_object_detected(45):
+    for _ in range(9):
+        movement_controller.turn_left_steering(10, degrees=(grados_para_giro_90_grados() / 9))
+        if sensor_manager.is_object_detected(50):
             izquierda = True
-            return izquierda
+            return izquierda, derecha
     # Volvemos a la posición inicial.
-    movement_controller.turn_right_steering()
+    movement_controller.turn_right_steering(10)
     # Giramos a la derecha y miramos si hay algún obstaculo mientras giramos
-    while movement_controller.turn_right_steering():
-        if sensor_manager.is_object_detected(45):
+    for _ in range(9):
+        movement_controller.turn_right_steering(10, degrees=(grados_para_giro_90_grados() / 9))
+        if sensor_manager.is_object_detected(50):
             derecha = True
-            return derecha
+            return izquierda, derecha
+    return izquierda, derecha
     
 
 # Función para seguir la linea negra y evitar obstáculos
@@ -123,8 +129,6 @@ def maniobra_evitar_obstaculos():
     movement_controller.turn_left_steering(10)
 
 
-
-
 # Programa Principal
 def main():
     # Cambiar el color de los leds y hacer un sonido
@@ -132,9 +136,18 @@ def main():
     leds.set_color("RIGHT", "GREEN")
     sound.beep()
 
-    
-
-    maniobra_evitar_obstaculos()
+    izquierda, derecha = maniobra_inicial()
+    sleep(3)
+    if izquierda == True:
+        movement_controller.move_forward_steering(30,30)
+    else:
+        sound.beep()
+    if derecha == True:
+        movement_controller.turn_left_steering(20)  
+    else:
+        sound.beep()
+        sound.beep()
+    #maniobra_evitar_obstaculos()
     
 
 if __name__ == "__main__":
