@@ -109,6 +109,7 @@ def maniobra_evitar_obstaculos(distancia):
     sleep(0.5)
     movement_controller.turn_left_steering(10)
 
+# Función para buscar la linea negra
 def maniobra_buscar_linea():
     negro = False
     obstaculos = 0
@@ -122,7 +123,7 @@ def maniobra_buscar_linea():
 
     # Mide la distancia al obstaculo
     distancia_obstaculo = sensor_manager.get_distance
-    distancia_movimiento = distancia_obstaculo + 20
+    distancia_movimiento = (distancia_obstaculo + 5.6) * 2
     
     # Gira 90º a la izquierda
     movement_controller.turn_left_steering(10)
@@ -163,7 +164,7 @@ def maniobra_buscar_linea():
         if sensor_manager.is_object_detected(40):
             obstaculos += 1
             break
-    
+    # Si hay 1 solo obstaculo.
     if obstaculos == 1:
         movement_controller.turn_right_steering(10)
         # Acercamos el robot a 20 cm o menos del obstaculo
@@ -185,16 +186,17 @@ def main():
     leds.set_color("RIGHT", "AMBER")
     sound.beep() 
 
+    # Bucle para buscar el primer obstaculo y nos quedamos mirandolo
     while deteccion == False:
         # Maniobra inical para saber donde está la linea negra y orientarnos. (Detecta objetos a < N cm)
         deteccion = maniobra_inicial(70)
         if deteccion == False:
             movement_controller.move_forward_steering(10, 15)
     
+    # Hacemos la maniobra para buscar la linea.
+    maniobra_buscar_linea()
 
-
-    #maniobra_evitar_obstaculos(20)
-    
+    # Cambiar el color de los leds y hacer un sonido
     leds.set_color("LEFT", "AMBER")
     leds.set_color("RIGHT", "GREEN")
     sound.beep()
