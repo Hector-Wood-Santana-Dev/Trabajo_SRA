@@ -113,16 +113,17 @@ def maniobra_evitar_obstaculos(distancia):
 def maniobra_buscar_linea():
     negro = False
     obstaculos = 0
-
+    
     # Acercamos el robot a 20 cm o menos del obstaculo
     for _ in range(25):
-        if sensor_manager.get_distance > 20:
+        if sensor_manager.get_distance() > 20:
             movement_controller.move_forward_steering(10, 3)
+            maniobra_inicial(60)    ################################################### Ponerle que rectifique su orientacion al obstaculo
         else:
             movement_controller.stop_steering()
 
     # Mide la distancia al obstaculo
-    distancia_obstaculo = sensor_manager.get_distance
+    distancia_obstaculo = sensor_manager.get_distance()
     distancia_movimiento = (distancia_obstaculo + 5.6) * 2
     
     # Gira 90º a la izquierda
@@ -132,7 +133,7 @@ def maniobra_buscar_linea():
     for i in range(100):
         movement_controller.move_forward_steering(10, distancia_obstaculo / 100)
         # Si detecta "NEGRO"
-        if sensor_manager.get_color == 1:
+        if sensor_manager.get_color() == 1:
             movement_controller.stop_steering()
             negro = True
             break
@@ -142,7 +143,7 @@ def maniobra_buscar_linea():
         for i in range(100):
             movement_controller.move_forward_steering(10, distancia_movimiento / 100)
             # Si detecta "NEGRO"
-            if sensor_manager.get_color == 1:
+            if sensor_manager.get_color() == 1:
                 movement_controller.stop_steering()
                 negro = True
                 break
@@ -169,7 +170,7 @@ def maniobra_buscar_linea():
         movement_controller.turn_right_steering(10)
         # Acercamos el robot a 20 cm o menos del obstaculo
         for _ in range(20):
-            if sensor_manager.get_distance > 20:
+            if sensor_manager.get_distance() > 20:
                 movement_controller.move_forward_steering(10, 2)
             else:
                 movement_controller.stop_steering()
