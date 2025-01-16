@@ -181,6 +181,7 @@ def maniobra_buscar_linea():
 
 # Programa Principal
 def main():
+    deteccion = False
     # Cambiar el color de los leds y hacer un sonido
     leds.set_color("LEFT", "RED")
     leds.set_color("RIGHT", "AMBER")
