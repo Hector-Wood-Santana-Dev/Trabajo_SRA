@@ -78,6 +78,7 @@ def maniobra_inicial(detection_range):
     for i in range(9):
         movement_controller.turn_left_steering(10, degrees=(grados_para_giro_90_grados() / 9))
         if sensor_manager.is_object_detected(detection_range):
+            movement_controller.turn_left_steering(10, degrees=(grados_para_giro_90_grados() / 9))
             deteccion = True
             return deteccion
     # Volvemos a la posición inicial.
@@ -87,6 +88,7 @@ def maniobra_inicial(detection_range):
         movement_controller.turn_right_steering(10, degrees=(grados_para_giro_90_grados() / 9))
         if sensor_manager.is_object_detected(detection_range):
             deteccion = True
+            movement_controller.turn_right_steering(10, degrees=(grados_para_giro_90_grados() / 9))
             return deteccion
     # Volvemos a la posición inicial.
     movement_controller.turn_left_steering(10)
@@ -115,10 +117,10 @@ def maniobra_buscar_linea():
     obstaculos = 0
     
     # Acercamos el robot a 20 cm o menos del obstaculo
-    for _ in range(25):
-        if sensor_manager.get_distance() > 20:
+    for _ in range(20):
+        if sensor_manager.get_distance() > 25:
             movement_controller.move_forward_steering(10, 3)
-            maniobra_inicial(60)    ################################################### Ponerle que rectifique su orientacion al obstaculo
+            maniobra_inicial(0)    ################################################### Ponerle que rectifique su orientacion al obstaculo
         else:
             movement_controller.stop_steering()
 
@@ -191,7 +193,7 @@ def main():
     # Bucle para buscar el primer obstaculo y nos quedamos mirandolo
     while deteccion == False:
         # Maniobra inical para saber donde está la linea negra y orientarnos. (Detecta objetos a < N cm)
-        deteccion = maniobra_inicial(70)
+        deteccion = maniobra_inicial(50)
         if deteccion == False:
             movement_controller.move_forward_steering(10, 15)
     
