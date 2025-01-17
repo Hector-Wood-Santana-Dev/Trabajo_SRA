@@ -107,11 +107,18 @@ def maniobra_evitar_obstaculos(distancia):
     sleep(0.5)
     movement_controller.turn_right_steering(10)
     sleep(0.5)
-    movement_controller.move_forward_steering(10, (distancia + 2.8) * 2)
+    movement_controller.move_forward_steering(10, (distancia + 5.6) * 2)
     sleep(0.5)
     movement_controller.turn_right_steering(10)
     sleep(0.5)
-    movement_controller.move_forward_steering(10, (distancia + 12.8))
+    movement_controller.move_forward_steering(10, (distancia))
+    sleep(0.5)
+    for i in range(20):
+        if sensor_manager.get_color() != 1:
+            movement_controller.move_forward_steering(5, 1)
+        else:
+            movement_controller.move_forward_steering(10, 7.5)
+            break   
     sleep(0.5)
     movement_controller.turn_left_steering(10)
 
@@ -123,6 +130,7 @@ def maniobra_buscar_linea():
     # Acercamos el robot a 25 cm o menos del obstaculo
     for _ in range(20):
         if sensor_manager.get_distance() > 35:
+            sleep(1)
             movement_controller.move_forward_steering(10, 2)
             maniobra_inicial(50)    
         else:
@@ -155,10 +163,7 @@ def maniobra_buscar_linea():
     if negro == False:
         movement_controller.turn_right_steering(10)
         #  Se va moviendo mientras mira si encuentra la linea negra
-        bloqueo = 0
-        counter_obj = 0
-        step_aux1 = 0
-        step_aux2 = 0
+        
         for i in range(100):
             movement_controller.move_forward_steering(5, 1)
             # Si detecta "NEGRO"
@@ -167,11 +172,18 @@ def maniobra_buscar_linea():
                 negro = True
                 sound.beep()###################################
                 break
+
+            bloqueo = 0
+            counter_obj = 0
+            step_aux1 = 0
+            step_aux2 = 0
+
             if i % 20 == 0:
                 movement_controller.turn_left_steering(10, degrees=45)
                 for step in range(54):
+                    movement_controller.turn_right_steering(5, degrees=5)
                     if sensor_manager.is_object_detected(50) & bloqueo <= 0:
-                        if counter_obj == 2:
+                        if counter_obj == 1:
                             step_aux2 = step
                             break
                         else:
@@ -180,7 +192,6 @@ def maniobra_buscar_linea():
                             step_aux1 = step
                     if bloqueo > 0:
                         bloqueo -= 1
-                    movement_controller.turn_right_steering(5, degrees=5)
                 
                 steps_move = int((step_aux2 - step_aux1) / 2)
                 for _ in range(steps_move):
@@ -219,12 +230,23 @@ def maniobra_buscar_linea():
             if sensor_manager.get_color() != 1:
                 movement_controller.turn_right_steering(5, degrees=1)
             else:
+                movement_controller.turn_right_steering(5, degrees=5)
                 break
         sound.beep()###################################
         # Acercamos el robot a 20 cm o menos del obstaculo
-        for _ in range(20):
+        for _ in range(40):
+            flag = True
+            if sensor_manager.get_color() != 1:
+                flag = True
+            else: 
+                flag = False
+            while flag:
+                movement_controller.turn_right_steering(5, 2)
+                if sensor_manager.color_sensor() == 1:
+                    flag = False
+        
             if sensor_manager.get_distance() > 20:
-                movement_controller.move_forward_steering(10, 2)
+                movement_controller.move_forward_steering(10, 1)
                 sound.beep()###################################
             else:
                 movement_controller.stop_steering()
@@ -250,7 +272,7 @@ def main():
         # Maniobra inical para saber donde está la linea negra y orientarnos. (Detecta objetos a < N cm)
         deteccion = maniobra_inicial(50)
         if deteccion == False:
-            movement_controller.move_forward_steering(10, 15)
+            movement_controller.move_forward_steering(10, 20)
     
     sound.beep()
     # Hacemos la maniobra para buscar la linea.
