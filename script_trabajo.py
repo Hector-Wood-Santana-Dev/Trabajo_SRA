@@ -184,14 +184,23 @@ def maniobra_buscar_linea():
             movement_controller.turn_right_steering(5, degrees=grados_flexible(5))
             break
     # Acercamos el robot a 20 cm o menos del obstaculo
+    aux_flag = False
     for _ in range(40):
         if sensor_manager.get_color() == 1 and sensor_manager.get_distance() > 20:
             movement_controller.move_forward_steering(10, 1)
         elif sensor_manager.get_color() != 1 and sensor_manager.get_distance() > 20:
-            for _ in range(20):
-                movement_controller.turn_right_steering(5, degrees=grados_flexible(2))
-                if sensor_manager.get_color() == 1:
-                    break
+            if aux_flag == False:
+                for _ in range(20):                
+                    movement_controller.turn_right_steering(5, degrees=grados_flexible(2))
+                    if sensor_manager.get_color() == 1:
+                        aux_flag = True
+                        break
+            else: 
+                for _ in range(20):                
+                    movement_controller.turn_left_steering(5, degrees=grados_flexible(2))
+                    if sensor_manager.get_color() == 1:
+                        aux_flag = False
+                        break
             movement_controller.move_forward_steering(10, 1)
         else:
             movement_controller.stop_steering()
